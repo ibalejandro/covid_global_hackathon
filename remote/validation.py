@@ -1,10 +1,9 @@
 import cv2
 
 
-def validate_video(video, length=600, fps=30):
-    assert validate_length(video, length)
+def validate_video(video, min_length=600, fps=30):
+    assert validate_length(video, min_length)
     assert validate_correctness(video)
-    assert validate_infrared(video)
     assert validate_fps(video, fps)
 
 
