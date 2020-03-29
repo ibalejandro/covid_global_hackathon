@@ -1,19 +1,17 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from flask_restful import Api
 from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate
 import shutil
 import cv2
 import os
 
 
-app = Flask(__name__)
-api = Api(app)
+application = Flask(__name__)
 
-CORS(app)
+CORS(application)
 
 
-@app.route('/inference', methods=['POST'])
+@application.route('/inference', methods=['POST'])
 def inference():
     if request.is_json:
             is_body_well_formed = True
@@ -53,6 +51,6 @@ def inference():
         status_code = 400
     return jsonify(result), status_code
 
-@app.route('/health-check', methods=['GET'])
+@application.route('/health-check', methods=['GET'])
 def get():
     return "OK"
