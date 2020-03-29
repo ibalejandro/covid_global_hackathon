@@ -1,0 +1,18 @@
+branch-defaults:
+  remote-measurements:
+    environment: covid-global-hackathon-prod
+    group_suffix: null
+global:
+  application_name: covid_global_hackathon
+  branch: null
+  default_ec2_keyname: covid-juanfe
+  default_platform: Python 3.6
+  default_region: us-west-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: covid-eb-deployer
+  repository: null
+  sc: git
+  workspace_type: Application

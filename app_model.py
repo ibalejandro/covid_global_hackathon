@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
+from flask_restful import Api
 from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate
 import shutil
 import cv2
@@ -7,9 +8,9 @@ import os
 
 
 app = Flask(__name__)
+api = Api(app)
 
 CORS(app)
-
 
 
 @app.route('/inference', methods=['POST'])
@@ -52,6 +53,6 @@ def inference():
         status_code = 400
     return jsonify(result), status_code
 
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+@app.route('/health-check', methods=['GET'])
+def get():
+    return "OK"
