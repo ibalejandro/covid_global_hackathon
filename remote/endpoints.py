@@ -38,7 +38,7 @@ def calculate_spo2(video, A=100, B=5, use_reduce=True, use_area=90, discretize=F
             print(f'Clipped SpO2 contains {len(clipped_spo2)} values')
         mean_spo2 = int(np.mean(clipped_spo2))
         if discretize:
-            return discretize_spO2(mean_spo2)
+            return discretize_spo2(mean_spo2)
         else:
             return mean_spo2
     return spo2

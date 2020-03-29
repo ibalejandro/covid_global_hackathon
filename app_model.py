@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate, discretize_spo2
-
+from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate
+import shutil
 import cv2
 import os
 
@@ -34,17 +34,14 @@ def inference():
 
                 file = 'videos/' + video_name
                 video = cv2.VideoCapture(file)
-                os.rmdir(file)
+                shutil.rmtree('videos')
                 validate_video(video)
                 video = process_video(video)
-                spo2 = calculate_spo2(video)
                 spo2_disc = calculate_spo2(video, discretize=True)
                 bpm = calculate_heart_rate(video)
-                bpm_disc = calculate_heart_rate(video, discretize=False)
 
-                result = {"name": file.split('/')[-1], "spo2": spo2, 
-                          "spo2_disc": spo2_disc, "bpm" : bpm, "bpm_disc": bpm_disc}
-
+                result = {"name": file.split('/')[-1], "spo2": spo2_disc, 
+                        "bpm" : bpm}
                 status_code = 200
             else:
                 result = {"name": file.split('/')[-1],
