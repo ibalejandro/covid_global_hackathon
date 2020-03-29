@@ -60,7 +60,7 @@ def calculate_heart_rate(video, use_reduce=True, frequency_range=(20, 200), fps=
     return red_means
 
 
-def discretize_spO2(spo2):
+def discretize_spo2(spo2):
     if spo2 >= 95:
         return 'normal'
     elif spo2 >= 91:
