@@ -39,12 +39,13 @@ def inference():
                     }
                     status_code = 400
                 if is_body_well_formed:
-                    s3_request = body.get("video")
-                    video_name = s3_request.split('/')[-1]
-                    bucket_name = s3_request.split('/')[-2]
+                    s3_request = body.get("video").replace('s3://', '')
+                    key = '/'.join(s3_request.split('/')[1:])
+                    video_name = os.path.basename(key)
+                    bucket_name = s3_request.split('/')[0]
                     os.mkdir('videos/')
                     file = 'videos/' + video_name
-                    s3_client.download_file(bucket_name, video_name, file)
+                    s3_client.download_file(bucket_name, key, file)
                     video = cv2.VideoCapture(file)
                     validate_video(video)
                     video = process_video(video)
