@@ -1,4 +1,8 @@
 from flask import Flask, render_template, request, jsonify
+import boto3
+from botocore.config import Config
+
+from botocore.exceptions import ClientError
 from flask_cors import CORS
 from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate
 import shutil
@@ -10,45 +14,56 @@ application = Flask(__name__)
 
 CORS(application)
 
+config_dict = {'connect_timeout': 60000000, 'read_timeout': 6000000}
+config = Config(**config_dict)
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+    config=config
+)
+
+
 
 @application.route('/inference', methods=['POST'])
 def inference():
-    if request.is_json:
-            is_body_well_formed = True
-            try:
-                body = request.json
-            except:
-                is_body_well_formed = False
-                result = {
-                    "message": "Specify a well-formed body"
-                }
-                status_code = 400
-            if is_body_well_formed:
-                s3_request = body.get("video")
-                video_name = s3_request.split('/')[-1]
-                os.mkdir('videos/')
-                bashCommand = "aws s3 cp " + s3_request + " " + "videos/" + video_name
-                os.system(bashCommand)
+    try:
+        if request.is_json:
+                is_body_well_formed = True
+                try:
+                    body = request.json
+                except:
+                    is_body_well_formed = False
+                    result = {
+                        "message": "Specify a well-formed body"
+                    }
+                    status_code = 400
+                if is_body_well_formed:
+                    s3_request = body.get("video")
+                    video_name = s3_request.split('/')[-1]
+                    bucket_name = s3_request.split('/')[-2]
+                    os.mkdir('videos/')
+                    file = 'videos/' + video_name
+                    s3_client.download_file(bucket_name, video_name, file)
+                    video = cv2.VideoCapture(file)
+                    validate_video(video)
+                    video = process_video(video)
+                    spo2_disc = calculate_spo2(video, discretize=True)
+                    bpm = calculate_heart_rate(video)
 
+                    result = {"name": file.split('/')[-1], "spo2": spo2_disc,
+                            "bpm" : bpm}
+                    status_code = 200
+                else:
+                    result = {"name": file.split('/')[-1],
+                            "message": "Invalid file"}
+                    status_code = 400
+        else:
+            result = {'prueba':request.is_json}
+            status_code = 400
+    finally:
+        shutil.rmtree('videos')
 
-                file = 'videos/' + video_name
-                video = cv2.VideoCapture(file)
-                shutil.rmtree('videos')
-                validate_video(video)
-                video = process_video(video)
-                spo2_disc = calculate_spo2(video, discretize=True)
-                bpm = calculate_heart_rate(video)
-
-                result = {"name": file.split('/')[-1], "spo2": spo2_disc, 
-                        "bpm" : bpm}
-                status_code = 200
-            else:
-                result = {"name": file.split('/')[-1],
-                        "message": "Invalid file"}
-                status_code = 400
-    else:
-        result = {'prueba':request.is_json}
-        status_code = 400
     return jsonify(result), status_code
 
 @application.route('/health-check', methods=['GET'])
