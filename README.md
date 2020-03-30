@@ -7,6 +7,7 @@ Below is the list of all repositories that were created to build the proposed sy
 - Coronavirus scoring: https://github.com/juanma9613/coronavirus_scoring
 - Doctors webapp: https://github.com/ibalejandro/doctors_web_app
 - Doctors API: https://github.com/factoredai/doctors-api
+- PPG API: https://github.com/ibalejandro/covid_global_hackathon/tree/remote-measurements
 
 ## Walk-through
 You can see the video walk-through of the proposed solution [here.](https://www.youtube.com/watch?v=TmYd_TsAXD0&feature=youtu.be)
