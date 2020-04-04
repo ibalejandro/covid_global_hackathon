@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import boto3
 from botocore.config import Config
-
-from botocore.exceptions import ClientError
 from flask_cors import CORS
 from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate
 import shutil
 import cv2
 import os
+import sys
+import traceback
 
 
 application = Flask(__name__)
@@ -62,6 +62,13 @@ def inference():
         else:
             result = {'prueba':request.is_json}
             status_code = 400
+    except Exception as e:
+
+        print('***** Error processing video *******')
+        print(traceback.format_exc())
+        print(' **** error **** ')
+        print(e)
+
     finally:
         shutil.rmtree('videos')
 
