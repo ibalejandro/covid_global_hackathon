@@ -1,2 +1,2 @@
-from .frame import KurylyakFrameValidator
+from .frame import ColorDistributionFrameValidator
 from .video import VideoValidator

@@ -15,9 +15,3 @@ def degree_to_rad(angle):
 
 def coordinate_grid(max_x, max_y):
     return np.array([[(y, x) for x in range(max_x)] for y in range(max_y)])
-
-
-def function_per_frame(video, channel, function):
-    raise DeprecationWarning()
-    reshaped_video = video[:, :, :, channel].reshape(video.shape[0], -1)
-    return function(reshaped_video, axis=-1)

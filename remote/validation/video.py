@@ -5,8 +5,11 @@ from .fixing import fix_with_trimming, fix_with_interpolation
 
 class VideoValidator:
 
-    def __init__(self, frame_validator):
-        self.frame_validator = frame_validator
+    def __repr__(self):
+        return f'VideoValidator with {self.frame_validator_class.__repr__()}'
+
+    def __init__(self, frame_validator_class):
+        self.frame_validator_class = frame_validator_class
 
     def validate(self, video):
         """Validates the status of each frame of the video according to the logic implemented
@@ -21,6 +24,7 @@ class VideoValidator:
                     frame, and the respective log information for further analysis.
         """
         assert isinstance(video, VideoReader)
+        self.frame_validator = self.frame_validator_class(video.channel_map)
         results = {'result': [], 'log': []}
         for frame in video.frames:
             res, log = self.frame_validator.validate(frame)

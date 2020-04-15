@@ -1,17 +1,32 @@
 import numpy as np
 from ..utils.assertions import validate_channel_map
+from abc import ABCMeta, abstractmethod
 
 
-class KurylyakFrameValidator:
+class FrameValidator(metaclass=ABCMeta):
+
+    def __init__(self, channel_map):
+        validate_channel_map(channel_map)
+        self.channel_map = channel_map
+
+    @abstractmethod
+    def validate(self, frame):
+        raise NotImplementedError('Override on inheritance')
+
+
+class ColorDistributionFrameValidator(FrameValidator):
     """
     The validation algorithms presented here are based on Chapter 5 (Smartphone-based
     Photoplethysmography Measurement) by Yuriy Kurylyak, Francesco Lamonaca and Domenico Grimaldi
     of the book "Digital Image and Signal Processing for Measurement Systems".
     """
 
+    @classmethod
+    def __repr__(cls):
+        return 'ColorDistribution'
+
     def __init__(self, channel_map, **kwargs):
-        validate_channel_map(channel_map)
-        self.channel_map = channel_map
+        super().__init__(channel_map)
         self.gled_min = kwargs.get('gled_min', 10)
         self.rled_min = kwargs.get('rled_min', 128)
         self.g_max = kwargs.get('g_max', 128)

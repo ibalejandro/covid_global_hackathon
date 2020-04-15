@@ -15,6 +15,8 @@ class NumpyVideo(VideoReader):
         self._format = ('frame', 'width', 'height', 'channel')
         self._channel_map = {'b': 0, 'g': 1, 'r': 2}
         self._fps = video.get(cv2.CAP_PROP_FPS)
+        video.release()
+        cv2.destroyAllWindows()
 
     @property
     def frames(self):

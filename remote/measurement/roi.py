@@ -1,19 +1,11 @@
 import numpy as np
-from abc import ABCMeta, abstractmethod
-
-
-class ROI():
-
-    @abstractmethod
-    def fit(self, video):
-        raise NotImplementedError('Override on inheritance')
-
-    @abstractmethod
-    def transform(self, video):
-        raise NotImplementedError('Override on inheritance')
+from .base_classes import ROI
     
 
 class RedThresholdROI(ROI):
+
+    def __repr__(self):
+        return 'RedThreshold'
     
     def __init__(self, calibration_frames=180, theta=0.2):
         self.calibration_frames = calibration_frames
@@ -45,3 +37,19 @@ class RedThresholdROI(ROI):
         if not self.is_fit:
             raise ValueError('Call .fit method before .transform')
         return video.frames[:, :, :, video.channel_map['r']] > self.threshold
+
+
+class FullChannelROI(ROI):
+
+    def __repr__(self):
+        return 'Full Channel'
+
+    def __init__(self, channel):
+        assert channel in ('r', 'g', 'b')
+        self.channel = channel
+
+    def fit(self, video):
+        return self
+
+    def transform(self, video):
+        return np.ones_like(video.frames[:, :, :, video.channel_map[self.channel]], dtype=np.bool)

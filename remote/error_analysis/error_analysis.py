@@ -17,3 +17,16 @@ def show_region_of_interest(frame, roi):
 
 def show_validity_map(bool_array):
     pass
+
+def show_fourier_spectrum(signal, frequency_range=(20, 75)):
+    low, upp = frequency_range
+    coefs = np.abs(np.fft.rfft(signal)[low:upp])
+    plt.clf()
+    plt.plot(coefs)
+    plt.xticks([i for i in range(0, len(coefs), 10)], labels=[i for i in range(low, upp, 10)])
+
+def main_detected_frequencies(signal, frequency_range=(20, 75), stds=2):
+    low, upp = frequency_range
+    coefs = np.abs(np.fft.rfft(signal)[low:upp])
+    main_coefs = coefs[coefs > np.mean(coefs) + stds * np.std(coefs)]
+    
