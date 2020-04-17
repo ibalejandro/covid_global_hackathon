@@ -9,9 +9,9 @@ class VideoReader:
 
 class NumpyVideo(VideoReader):
 
-    def __init__(self, path):
+    def __init__(self, path, resize_to=(320, 240)):
         video = cv2.VideoCapture(path)
-        self._frames = cv2_to_numpy(video)
+        self._frames = cv2_to_numpy(video, resize_to)
         self._format = ('frame', 'width', 'height', 'channel')
         self._channel_map = {'b': 0, 'g': 1, 'r': 2}
         self._fps = video.get(cv2.CAP_PROP_FPS)

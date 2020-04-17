@@ -1,17 +1,12 @@
 import numpy as np
 
 
-def intersect2d(A, B):
-    nrows, ncols = A.shape
-    dtype={'names':['f{}'.format(i) for i in range(ncols)],
-           'formats':ncols * [A.dtype]}
-    C = np.intersect1d(A.view(dtype), B.view(dtype))
-    return C.view(A.dtype).reshape(-1, ncols)
-
-
-def degree_to_rad(angle):
-    return angle * np.pi / 180
-
-
-def coordinate_grid(max_x, max_y):
-    return np.array([[(y, x) for x in range(max_x)] for y in range(max_y)])
+def extract_frequency_in_bpm(s, fps):
+    """Taken from:
+    https://stackoverflow.com/questions/3694918/how-to-extract-frequency-associated-with-fft-values-in-python
+    """
+    w = np.abs(np.fft.fft(s))
+    freqs = np.fft.fftfreq(len(w))
+    idx = np.argmax(w)
+    dominant_freq = freqs[idx]
+    return 60*np.abs(dominant_freq * fps)
