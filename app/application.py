@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import boto3
 from botocore.config import Config
 from flask_cors import CORS
-from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate
+from remote.readers import NumpyVideo
+from remote.estimators import HeartRateEstimator, SpO2Estimator
 import shutil
 import cv2
 import os
@@ -46,13 +47,18 @@ def inference():
                     os.mkdir('videos/')
                     file = 'videos/' + video_name
                     s3_client.download_file(bucket_name, key, file)
-                    video = cv2.VideoCapture(file)
-                    validate_video(video)
-                    video = process_video(video)
-                    spo2_disc = calculate_spo2(video, discretize=True)
-                    bpm = calculate_heart_rate(video)
 
-                    result = {"name": file.split('/')[-1], "spo2": spo2_disc,
+                    video = NumpyVideo(file)
+                    spo2, is_valid_spo2 = SpO2Estimator().estimate(video)
+                    bpm, is_valid_bpm = HeartRateEstimator().estimate(video)
+
+                    if not is_valid_spo2:
+                        spo2 = None
+
+                    if not is_valid_bpm:
+                        bpm = None
+
+                    result = {"name": file.split('/')[-1], "spo2": spo2,
                             "bpm" : bpm}
                     status_code = 200
                 else:
