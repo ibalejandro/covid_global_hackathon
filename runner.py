@@ -30,7 +30,9 @@ def process_video_analysis_requests():
     if 'Messages' in queue_messages:
         print(f'Received {len(queue_messages["Messages"])} messages')
         for message in queue_messages['Messages']:
+            if 'Body' not in message: continue
             s3_event = json.loads(message['Body'])
+            if 'Records' not in s3_event: continue
             records = s3_event['Records']
             for record in records:
                 if 's3' not in record:
