@@ -6,6 +6,7 @@ from os import path
 import boto3
 import cv2
 from botocore.config import Config
+from app.services.reports import create_report
 
 from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate
 
@@ -73,15 +74,9 @@ def process_video_from_url(s3_url):
     spo2_disc = calculate_spo2(video, discretize=True)
     bpm = calculate_heart_rate(video)
 
-    result = {
-        "name": s3_url,
-        "spo2": spo2_disc,
-        "bpm": bpm
-    }
+    response = create_report(telemetry_type='ppg', spo2_disc=spo2_disc, bpm=bpm, s3_url=s3_url)
 
-    print(result)
-
-    return result
+    return response
 
 
 process_video_analysis_requests()
