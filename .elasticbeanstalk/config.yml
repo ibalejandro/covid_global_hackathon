@@ -1,4 +1,7 @@
 branch-defaults:
+  dsp:
+    environment: covid-global-hackathon-dev
+    group_suffix: null
   remote-measurements:
     environment: covid-global-hackathon-prod
     group_suffix: null
