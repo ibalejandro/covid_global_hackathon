@@ -4,10 +4,10 @@ import traceback
 from os import path
 
 import boto3
-import cv2
 from botocore.config import Config
 
-from remote import validate_video, process_video, calculate_spo2, calculate_heart_rate
+from remote.estimators import HeartRateEstimator, SpO2Estimator
+from remote.readers import NumpyVideo
 
 config_dict = {'connect_timeout': 60000000, 'read_timeout': 6000000}
 config = Config(**config_dict)
@@ -43,12 +43,14 @@ def process_video_analysis_requests():
 
                 try:
                     result = process_video_from_url(s3_url)
+                    print('Done processing video', s3_url)
                 except Exception as error:
                     print('Could not process', s3_url, traceback.print_stack(error))
 
                 if result is not None:
                     try:
                         sqs_client.delete_message(QueueUrl=sqs_queue, ReceiptHandle=message['ReceiptHandle'])
+                        print('Deleted sqs message', s3_url)
                     except Exception as error:
                         print('Could not delete message', s3_url, traceback.print_stack(error))
 
@@ -67,19 +69,21 @@ def process_video_from_url(s3_url):
 
     file = 'videos/' + video_name
     s3_client.download_file(bucket_name, key, file)
-    video = cv2.VideoCapture(file)
-    validate_video(video)
-    video = process_video(video)
-    spo2_disc = calculate_spo2(video, discretize=True)
-    bpm = calculate_heart_rate(video)
+    video = NumpyVideo(file)
+    spo2, is_valid_spo2 = SpO2Estimator().estimate(video)
+    bpm, is_valid_bpm = HeartRateEstimator().estimate(video)
+
+    if not is_valid_spo2:
+        spo2 = None
+
+    if not is_valid_bpm:
+        bpm = None
 
     result = {
         "name": s3_url,
-        "spo2": spo2_disc,
+        "spo2": spo2,
         "bpm": bpm
     }
-
-    print(result)
 
     return result
 
