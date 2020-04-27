@@ -1,0 +1,2 @@
+#!/bin/sh
+aws ecs run-task --cluster arn:aws:ecs:us-west-2:240851575709:cluster/sincovid-telemetry --count 1 --group family:5vid-telemetry-LARGE --launch-type FARGATE --network-configuration awsvpcConfiguration="{subnets=["subnet-18993140","subnet-8c1d61a4"],securityGroups=["sg-00c27c2171284f4cf"],assignPublicIp="ENABLED"}" --started-by "cli" --task-definition 5vid-telemetry-LARGE:7 --region us-west-2 --profile 5vid-admin
