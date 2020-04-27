@@ -6,6 +6,7 @@ from os import path
 import boto3
 from botocore.config import Config
 
+from app.services import reports
 from remote.estimators import HeartRateEstimator, SpO2Estimator
 from remote.readers import NumpyVideo
 
@@ -84,6 +85,12 @@ def process_video_from_url(s3_url):
         "spo2": spo2,
         "bpm": bpm
     }
+
+    try:
+        reports.create_report('ppg', spo2, bpm, s3_url)
+    except Exception as e:
+        print("Could not create report for", s3_url)
+        return None
 
     return result
 
