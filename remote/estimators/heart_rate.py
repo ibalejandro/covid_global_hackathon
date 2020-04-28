@@ -1,13 +1,14 @@
 import numpy as np
 from ..utils.quality import crop_recording_errors, butterworth_filter_signal
 from ..utils.utils import extract_frequency_in_bpm
-from ..roi import TemporalDifferenceROI
+# from ..roi import TemporalDifferenceROI
 
 
 class HeartRateEstimator:
 
     def __init__(self):
-        self.roi_generator = TemporalDifferenceROI()
+        #self.roi_generator = TemporalDifferenceROI()
+        pass
 
     def _generate_signal(self, frames, roi, channel):
         s = np.zeros(len(roi))
