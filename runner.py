@@ -74,20 +74,8 @@ def process_video_from_url(s3_url):
     spo2, is_valid_spo2 = SpO2Estimator().estimate(video)
     bpm, is_valid_bpm = HeartRateEstimator().estimate(video)
 
-    if not is_valid_spo2:
-        spo2 = None
-
-    if not is_valid_bpm:
-        bpm = None
-
-    result = {
-        "name": s3_url,
-        "spo2": spo2,
-        "bpm": bpm
-    }
-
     try:
-        reports.create_report('ppg', spo2, bpm, s3_url)
+        result = reports.create_report('ppg', spo2, bpm, is_valid_spo2, is_valid_bpm, s3_url)
     except Exception as e:
         print("Could not create report for", s3_url)
         return None

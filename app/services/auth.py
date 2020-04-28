@@ -23,5 +23,4 @@ def getAuthToken():
         return data['access_token']
 
     except Exception as error:
-        print('An error ocurred getting auth token')
-        print(error)
+        print('An error ocurred getting auth token', error)
